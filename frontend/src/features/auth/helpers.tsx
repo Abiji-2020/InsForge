@@ -5,6 +5,7 @@ import Microsoft from '@/assets/logos/microsoft.svg?react';
 import Discord from '@/assets/logos/discord.svg?react';
 import LinkedIn from '@/assets/logos/linkedin.svg?react';
 import Facebook from '@/assets/logos/facebook.svg?react';
+import X from '@/assets/logos/x.svg?react';
 import type { OAuthProvidersSchema } from '@insforge/shared-schemas';
 
 export enum AuthTab {
@@ -64,12 +65,20 @@ export const oauthProviders: OAuthProviderInfo[] = [
     description: 'Configure Facebook authentication for your users',
     setupUrl: 'https://developers.facebook.com/apps',
   },
+  {
+    id: 'x',
+    name: 'X OAuth',
+    icon: <X className="w-6 h-6 text-black dark:text-white" />,
+    description: 'Configure X authentication for your users',
+    setupUrl: 'https://developer.x.com/en/portal/dashboard',
+  },
 ];
 
 /**
  * AI prompts for implementing auth components
  */
-export const AUTH_IMPLEMENTATION_PROMPT = `
+export const getAuthImplementationPrompt = (baseUrl: string) => {
+  return `
 # Add InsForge Authentication to Your Application
 The \`@insforge/react\` package provides **complete authentication solution for React applications**. Use deployed auth pages (built-in auth) or custom UI components—works with Vite.
 **Scope:** All AI-generated advice or code related to InsForge must follow these guardrails. We don't support other frameworks or libraries.
@@ -85,7 +94,7 @@ npm install @insforge/react@latest
 ### Step 2: Set Environment Variables
 
 \`\`\`bash .env
-VITE_INSFORGE_BASE_URL=https://your-app.region.insforge.app
+VITE_INSFORGE_BASE_URL=${baseUrl}
 VITE_INSFORGE_ANON_KEY=your-anon-key-here
 \`\`\`
 
@@ -101,20 +110,13 @@ import App from './App';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <InsforgeProvider
-      baseUrl={
-        import.meta.env.VITE_INSFORGE_BASE_URL || 'https://your-app.region.insforge.app' // Replace with your InsForge backend URL
-      }
-    >
+    <InsforgeProvider baseUrl="${baseUrl}">
       <App />
     </InsforgeProvider>
-  </StrictMode>
+  </StrictMode>,
 );
 \`\`\`
 
-### Step 4: Use Hooks & Components
-
-\`\`\`tsx src/pages/Home.tsx
 import { SignInButton, SignUpButton, SignedIn, SignedOut, UserButton, useUser } from '@insforge/react';
 
 export default function Home() {
@@ -194,5 +196,5 @@ function UserProfile() {
 
 - \`user\` - User object with id, email, name, avatarUrl
 - \`isLoaded\` - Boolean loading state
-
 `;
+};
